@@ -7,7 +7,7 @@ from dotenv import dotenv_values
 import requests
 from flask import Flask, request
 
-app = Flask(__name__)
+app = Flask("CSADues")
 global config
 config = dotenv_values(".env")
 
