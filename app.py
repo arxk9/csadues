@@ -2,23 +2,19 @@ import os
 import sys
 import json
 from datetime import datetime
-from dotenv import dotenv_values
 
 import requests
 from flask import Flask, request
 
 app = Flask("CSADues")
-global config
-config = dotenv_values(".env")
 
 
 @app.route('/', methods=['GET'])
 def verify():
-    global config
     # when the endpoint is registered as a webhook, it must echo back
     # the 'hub.challenge' value it receives in the query arguments
     if request.args.get("hub.mode") == "subscribe" and request.args.get("hub.challenge"):
-        if not request.args.get("hub.verify_token") == config["VERIFY_TOKEN"]:
+        if not request.args.get("hub.verify_token") == os.environ.get("VERIFY_TOKEN"):
             return "Verification token mismatch", 403
         return request.args["hub.challenge"], 200
 
@@ -59,11 +55,10 @@ def webhook():
 
 
 def send_message(recipient_id, message_text):
-    global config
     log("sending message to {recipient}: {text}".format(recipient=recipient_id, text=message_text))
 
     params = {
-        "access_token": config["PAGE_ACCESS_TOKEN"]
+        "access_token": os.environ.get("PAGE_ACCESS_TOKEN")
     }
     headers = {
         "Content-Type": "application/json"
